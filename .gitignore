@@ -1,0 +1,53 @@
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Output directories
+bin/
+tmp/
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Environment and config files
+
+config.local.yaml
+config.production.yaml
+
+# Debug and logs
+debug
+*.log
+
+# Test coverage
+coverage.out
+coverage.html
+
+# Project specific
+tmp/
+build/
+
+# Air (Hot reload) temporary files
+.air.toml
+tmp/
+
+# Database files
+*.sql.dump
+*.dump
+
+# Dependencies
+vendor/
+
+# Binary file
+dcf
+
+.env
+
