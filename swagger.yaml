@@ -1,0 +1,1519 @@
+openapi: 3.0.0
+info:
+  title: DCF Backend API
+  description: API for DCF Backend services
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Main API server
+tags:
+  - name: Documentation
+    description: API documentation
+  - name: Authentication
+    description: Authentication operations
+  - name: Users
+    description: User management operations
+  - name: Volunteers
+    description: Volunteer operations
+  - name: Restaurants
+    description: Restaurant operations
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: securePassword123
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+    
+    RegisterRestaurantRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegisterRequest'
+        - type: object
+          required:
+            - restaurantName
+            - address
+            - phoneNumber
+          properties:
+            restaurantName:
+              type: string
+              example: Community Kitchen
+            address:
+              type: string
+              example: 123 Main St, City, Country
+            phoneNumber:
+              type: string
+              example: "+1234567890"
+            description:
+              type: string
+              example: A community kitchen serving those in need
+    
+    RegisterVolunteerRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegisterRequest'
+        - type: object
+          required:
+            - phoneNumber
+            - address
+          properties:
+            phoneNumber:
+              type: string
+              example: "+1234567890"
+            address:
+              type: string
+              example: 123 Main St, City, Country
+    
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: securePassword123
+    
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        type:
+          type: string
+          enum: [admin, restaurant, volunteer]
+          example: volunteer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error message"
+    
+    Volunteer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        user_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        full_name:
+          type: string
+          example: John Doe
+        phone_number:
+          type: string
+          example: "+1234567890"
+        address:
+          type: string
+          example: "123 Main St, City, Country"
+        tasks_completed:
+          type: integer
+          example: 12
+        hours_volunteered:
+          type: integer
+          example: 36
+        meals_served:
+          type: integer
+          example: 240
+        reputation_points:
+          type: integer
+          example: 450
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    VolunteerDashboard:
+      type: object
+      properties:
+        volunteer:
+          $ref: '#/components/schemas/Volunteer'
+        stats:
+          type: object
+          properties:
+            tasks_completed:
+              type: integer
+              example: 12
+            hours_volunteered:
+              type: integer
+              example: 36
+            meals_served:
+              type: integer
+              example: 240
+            reputation_points:
+              type: integer
+              example: 450
+        upcoming_tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpcomingTask'
+        nearby_opportunities:
+          type: array
+          items:
+            $ref: '#/components/schemas/NearbyOpportunity'
+        badges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Badge'
+    
+    UpcomingTask:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        event_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        title:
+          type: string
+          example: "Food Preparation"
+        location:
+          type: string
+          example: "Al-Noor Mosque"
+        date:
+          type: string
+          format: date
+          example: "2023-03-15"
+        start_time:
+          type: string
+          format: time
+          example: "15:30"
+        end_time:
+          type: string
+          format: time
+          example: "17:30"
+        status:
+          type: string
+          enum: [confirmed, pending]
+          example: "confirmed"
+        role:
+          type: string
+          example: "food preparation"
+        checked_in:
+          type: boolean
+          example: false
+    
+    NearbyOpportunity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        title:
+          type: string
+          example: "Al-Noor Mosque"
+        description:
+          type: string
+          example: "Needs 5 volunteers for food preparation"
+        distance:
+          type: number
+          format: float
+          example: 1.5
+        distance_unit:
+          type: string
+          example: "miles"
+        roles_needed:
+          type: array
+          items:
+            type: string
+          example: ["food preparation", "serving", "cleanup"]
+        date:
+          type: string
+          format: date
+          example: "2023-03-15"
+        start_time:
+          type: string
+          format: time
+          example: "15:30"
+        end_time:
+          type: string
+          format: time
+          example: "17:30"
+    
+    Badge:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: "First Timer"
+        description:
+          type: string
+          example: "Completed your first volunteer task"
+        icon:
+          type: string
+          example: "first_timer_icon"
+        earned_at:
+          type: string
+          format: date-time
+    
+    EventApplication:
+      type: object
+      required:
+        - event_id
+        - role
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        role:
+          type: string
+          example: "food preparation"
+    
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        user_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: "Community Kitchen"
+        address:
+          type: string
+          example: "456 Main St, City, Country"
+        phone_number:
+          type: string
+          example: "+1234567890"
+        description:
+          type: string
+          example: "A community kitchen serving those in need"
+        total_events:
+          type: integer
+          example: 25
+        meals_served:
+          type: integer
+          example: 2500
+        rating:
+          type: number
+          format: float
+          example: 4.8
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    RestaurantDashboard:
+      type: object
+      properties:
+        restaurant:
+          $ref: '#/components/schemas/Restaurant'
+        total_events:
+          type: integer
+          example: 25
+        meals_served:
+          type: integer
+          example: 2500
+        volunteer_count:
+          type: integer
+          example: 50
+        upcoming_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+        pending_applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/VolunteerApplication'
+    
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        restaurant_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        title:
+          type: string
+          example: "Friday Food Distribution"
+        description:
+          type: string
+          example: "Weekly food distribution event"
+        location:
+          type: string
+          example: "Community Center, 123 Main St"
+        date:
+          type: string
+          format: date
+          example: "2023-03-15"
+        start_time:
+          type: string
+          format: time
+          example: "15:30"
+        end_time:
+          type: string
+          format: time
+          example: "17:30"
+        max_guests:
+          type: integer
+          example: 100
+        guest_count:
+          type: integer
+          example: 75
+        max_volunteers:
+          type: integer
+          example: 10
+        meals_served:
+          type: integer
+          example: 80
+        status:
+          type: string
+          enum: [upcoming, active, past, cancelled]
+          example: "upcoming"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    EventCreate:
+      type: object
+      required:
+        - title
+        - description
+        - location
+        - date
+        - start_time
+        - end_time
+        - max_guests
+        - max_volunteers
+      properties:
+        title:
+          type: string
+          example: "Friday Food Distribution"
+        description:
+          type: string
+          example: "Weekly food distribution event"
+        location:
+          type: string
+          example: "Community Center, 123 Main St"
+        date:
+          type: string
+          format: date
+          example: "2023-03-15"
+        start_time:
+          type: string
+          format: time
+          example: "15:30"
+        end_time:
+          type: string
+          format: time
+          example: "17:30"
+        max_guests:
+          type: integer
+          example: 100
+        max_volunteers:
+          type: integer
+          example: 10
+    
+    EventUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Friday Food Distribution"
+        description:
+          type: string
+          example: "Weekly food distribution event"
+        location:
+          type: string
+          example: "Community Center, 123 Main St"
+        date:
+          type: string
+          format: date
+          example: "2023-03-15"
+        start_time:
+          type: string
+          format: time
+          example: "15:30"
+        end_time:
+          type: string
+          format: time
+          example: "17:30"
+        max_guests:
+          type: integer
+          example: 100
+        max_volunteers:
+          type: integer
+          example: 10
+    
+    VolunteerApplication:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        volunteer_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        event_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        volunteer:
+          $ref: '#/components/schemas/Volunteer'
+        event:
+          $ref: '#/components/schemas/Event'
+        role:
+          type: string
+          example: "food preparation"
+        status:
+          type: string
+          enum: [pending, approved, declined]
+          example: "pending"
+        created_at:
+          type: string
+          format: date-time
+
+paths:
+  # Authentication paths
+  /auth/register_restaurant:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new restaurant
+      description: Creates a new restaurant account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRestaurantRequest'
+      responses:
+        '201':
+          description: Restaurant registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Creates a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login a user
+      description: Authenticates a user and returns a token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/validate:
+    get:
+      tags:
+        - Authentication
+      summary: Validate a token
+      description: Validates a JWT token and returns the associated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh a token
+      description: Refreshes an existing JWT token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token successfully refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout a user
+      description: Invalidates the current JWT token
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Successfully logged out
+        '401':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /user/me:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Returns a user by their ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Updates a user's information
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /volunteer/dashboard:
+    get:
+      tags:
+        - Volunteers
+      summary: Get volunteer dashboard
+      description: Returns the volunteer dashboard with stats, upcoming tasks, and opportunities
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerDashboard'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Volunteer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /volunteer/tasks:
+    get:
+      tags:
+        - Volunteers
+      summary: Get volunteer's upcoming tasks
+      description: Returns the volunteer's upcoming tasks
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpcomingTask'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Volunteer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /volunteer/opportunities:
+    get:
+      tags:
+        - Volunteers
+      summary: Get nearby volunteer opportunities
+      description: Returns nearby volunteer opportunities
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Opportunities retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NearbyOpportunity'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Volunteer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /volunteer/badges:
+    get:
+      tags:
+        - Volunteers
+      summary: Get volunteer's earned badges
+      description: Returns the volunteer's earned badges
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Badges retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Badge'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Volunteer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /volunteer/apply:
+    post:
+      tags:
+        - Volunteers
+      summary: Apply for an event
+      description: Submit an application for a volunteer event
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventApplication'
+      responses:
+        '200':
+          description: Application submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application submitted successfully"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Volunteer or event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /volunteer/checkin/{id}:
+    post:
+      tags:
+        - Volunteers
+      summary: Check in for an event
+      description: Check in for a volunteer event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event volunteer ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Checked in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Checked in successfully"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Volunteer or event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/dashboard:
+    get:
+      tags:
+        - Restaurants
+      summary: Get restaurant dashboard
+      description: Returns the restaurant dashboard with stats, upcoming events, and volunteer applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantDashboard'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/events:
+    get:
+      tags:
+        - Restaurants
+      summary: Get restaurant events
+      description: Returns all events for the restaurant
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      tags:
+        - Restaurants
+      summary: Create a new event
+      description: Creates a new event for the restaurant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreate'
+      responses:
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/events/{id}:
+    get:
+      tags:
+        - Restaurants
+      summary: Get event details
+      description: Returns details for a specific event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Restaurants
+      summary: Update event
+      description: Updates an existing event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdate'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      tags:
+        - Restaurants
+      summary: Delete event
+      description: Deletes an event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Event deleted successfully"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/events/{id}/status:
+    patch:
+      tags:
+        - Restaurants
+      summary: Update event status
+      description: Updates the status of an event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [upcoming, active, past, cancelled]
+                  example: "active"
+      responses:
+        '200':
+          description: Event status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/events/{id}/guests:
+    patch:
+      tags:
+        - Restaurants
+      summary: Update guest count
+      description: Updates the guest count for an event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - guest_count
+              properties:
+                guest_count:
+                  type: integer
+                  example: 50
+      responses:
+        '200':
+          description: Guest count updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/events/{id}/meals:
+    patch:
+      tags:
+        - Restaurants
+      summary: Update meals served
+      description: Updates the number of meals served for an event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - meals_served
+              properties:
+                meals_served:
+                  type: integer
+                  example: 100
+      responses:
+        '200':
+          description: Meals served updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/applications:
+    get:
+      tags:
+        - Restaurants
+      summary: Get volunteer applications
+      description: Returns all volunteer applications for the restaurant's events
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Applications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VolunteerApplication'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/applications/{id}/approve:
+    post:
+      tags:
+        - Restaurants
+      summary: Approve volunteer application
+      description: Approves a volunteer application
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Application ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Application approved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application approved successfully"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /restaurant/applications/{id}/decline:
+    post:
+      tags:
+        - Restaurants
+      summary: Decline volunteer application
+      description: Declines a volunteer application
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Application ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Application declined successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application declined successfully"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  # Add this special documentation endpoint
+  /schemas:
+    get:
+      tags:
+        - Documentation
+      summary: API Schemas
+      description: Documentation for all API schemas
+      responses:
+        '200':
+          description: Schema documentation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schemas:
+                    type: object
+                    properties:
+                      User:
+                        $ref: '#/components/schemas/User'
+                      Volunteer:
+                        $ref: '#/components/schemas/Volunteer'
+                      Restaurant:
+                        $ref: '#/components/schemas/Restaurant'
+                      Event:
+                        $ref: '#/components/schemas/Event'
+                      VolunteerDashboard:
+                        $ref: '#/components/schemas/VolunteerDashboard'
+                      RestaurantDashboard:
+                        $ref: '#/components/schemas/RestaurantDashboard'
+                      UpcomingTask:
+                        $ref: '#/components/schemas/UpcomingTask'
+                      NearbyOpportunity:
+                        $ref: '#/components/schemas/NearbyOpportunity'
+                      Badge:
+                        $ref: '#/components/schemas/Badge'
+                      VolunteerApplication:
+                        $ref: '#/components/schemas/VolunteerApplication'
+                      EventCreate:
+                        $ref: '#/components/schemas/EventCreate'
+                      EventUpdate:
+                        $ref: '#/components/schemas/EventUpdate'
+                      RegisterRequest:
+                        $ref: '#/components/schemas/RegisterRequest'
+                      RegisterRestaurantRequest:
+                        $ref: '#/components/schemas/RegisterRestaurantRequest'
+                      RegisterVolunteerRequest:
+                        $ref: '#/components/schemas/RegisterVolunteerRequest'
+                      LoginRequest:
+                        $ref: '#/components/schemas/LoginRequest'
+                      AuthResponse:
+                        $ref: '#/components/schemas/AuthResponse'
+                      Error:
+                        $ref: '#/components/schemas/Error' 
