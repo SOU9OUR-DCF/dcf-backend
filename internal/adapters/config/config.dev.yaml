@@ -1,0 +1,18 @@
+database:
+  host: localhost
+  port: 5433  
+  user: root
+  password: password
+  name: dcf_db
+
+redis:
+  address: "localhost:6379"
+  password: "password"
+
+jwt:
+  secret: "my_super_secret_key"
+  expiresIn: 24h
+
+cors:
+  allowedOrigins:
+    - "http://localhost:3000"

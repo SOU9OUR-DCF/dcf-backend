@@ -1,0 +1,23 @@
+server:
+  port: 80
+
+database:
+  host: psql_database
+  port: 5432
+  user: ${DB_USER:-root}
+  password: ${DB_PASSWORD:-password}
+  name: ${DB_NAME:-dcf_db}
+  sslmode: disable
+
+redis:
+  address: "redis:6379"  
+  password: ${REDIS_PASSWORD:-password}
+  
+cors:
+  allowedOrigins:
+    - "http://localhost:3000"
+    - "https://dcf-frontend.vercel.app"
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiresIn: 24h

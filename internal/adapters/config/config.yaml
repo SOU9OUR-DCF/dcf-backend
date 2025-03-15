@@ -1,0 +1,14 @@
+server:
+  readTimeout: 10s
+  writeTimeout: 10s
+  shutdownTimeout: 30s
+
+database:
+  sslmode: disable
+
+redis:
+  db: 0
+
+swagger:
+  enabled: true
+  path: "/swagger.yaml"
