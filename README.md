@@ -1,7 +1,7 @@
 # Tatawo3 Backend
 ## Overview
 
-The Tatawo3 Backend is a robust API service designed to connect restaurants with surplus food to volunteers who can distribute it to those in need. This platform aims to reduce food waste while addressing food insecurity in communities.
+The Tatawo3 Backend is a robust API service designed to connect organization to volunteers 
 
 ## Architecture
 
